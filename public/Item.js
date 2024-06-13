@@ -33,9 +33,8 @@ class Item {
             this.y = 0;
         }
 
-        // 충돌
         return result;
     }
 }
 
-export default Item
+export default Item;

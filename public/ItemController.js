@@ -1,13 +1,11 @@
 import Item from "./Item.js";
 
 class ItemController {
-
     INTERVAL_MIN = 0;
     INTERVAL_MAX = 12000;
 
     nextInterval = null;
     items = [];
-
 
     constructor(ctx, itemImages, scaleRatio, speed) {
         this.ctx = ctx;
@@ -51,7 +49,6 @@ class ItemController {
 
         this.items.push(item);
     }
-
 
     update(gameSpeed, deltaTime) {
         if(this.nextInterval <= 0) {

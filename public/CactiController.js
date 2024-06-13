@@ -1,13 +1,11 @@
 import Cactus from "./Cactus.js";
 
 class CactiController {
-
     CACTUS_INTERVAL_MIN = 500;
     CACTUS_INTERVAL_MAX = 2000;
 
     nextCactusInterval = null;
     cacti = [];
-
 
     constructor(ctx, cactiImages, scaleRatio, speed) {
         this.ctx = ctx;
@@ -48,10 +46,8 @@ class CactiController {
         this.cacti.push(cactus);
     }
 
-
     update(gameSpeed, deltaTime) {
         if(this.nextCactusInterval <= 0) {
-            // 선인장 생성
             this.createCactus();
             this.setNextCactusTime();
         }
@@ -60,9 +56,8 @@ class CactiController {
 
         this.cacti.forEach((cactus) => {
             cactus.update(this.speed, gameSpeed, deltaTime, this.scaleRatio);
-        })
+        });
 
-        // 지나간 선인장 삭제
         this.cacti = this.cacti.filter(cactus => cactus.x > -cactus.width);
     }
 

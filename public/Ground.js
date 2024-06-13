@@ -1,5 +1,4 @@
 class Ground {
-
     constructor(ctx, width, height, speed, scaleRatio) {
         this.ctx = ctx;
         this.canvas = ctx.canvas;
@@ -30,14 +29,12 @@ class Ground {
 
         this.ctx.drawImage(
             this.groundImage,
-            // 2개 연결
             this.x + this.width,
             this.y,
             this.width,
             this.height
         );
 
-        // 땅이 끝났을 때 처음으로
         if (this.x < -this.width) {
             this.x = 0;
         }

@@ -2,22 +2,36 @@ class Score {
   score = 0;
   HIGH_SCORE_KEY = 'highScore';
 
-  constructor(ctx, scaleRatio) {
+  constructor(ctx, scaleRatio, stageData, itemData) {
     this.ctx = ctx;
     this.canvas = ctx.canvas;
     this.scaleRatio = scaleRatio;
+    this.stageData = stageData.data;  // stageData 배열로 접근
+    this.itemData = itemData.data;    // itemData 배열로 접근
+    this.currentStage = 0;
   }
 
   update(deltaTime) {
     this.score += deltaTime * 0.001;
+
+    // 스테이지 업그레이드
+    this.stageData.forEach((stage, index) => {
+      if (this.score >= stage.score) {
+        this.currentStage = index;
+      }
+    });
   }
 
   getItem(itemId) {
-    this.score += 0;
+    const item = this.itemData.find(item => item.id === itemId);
+    if (item) {
+      this.score += item.score;
+    }
   }
 
   reset() {
     this.score = 0;
+    this.currentStage = 0;
   }
 
   setHighScore() {
