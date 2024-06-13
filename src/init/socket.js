@@ -1,8 +1,11 @@
-import { Server } from 'socket.io';
+import { Server as SocketIO } from 'socket.io';
+import registerHandler from '../handlers/register.handler.js';
 
-export const initializeSocket = (server) => {
-  const io = new Server(server);
+export const initSocket = (server) => {
+  const io = new SocketIO();
+  io.attach(server);
 
+  registerHandler(io);
   io.on('connection', (socket) => {
     console.log('a user connected:', socket.id);
 

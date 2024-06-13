@@ -1,0 +1,14 @@
+{
+    "printWidth": 100, // 코드의 최대 길이
+    "tabWidth": 2, // 탭의 너비
+    "useTabs": false, // 스페이스 대신 탭을 사용할지 여부
+    "semi": true, // 문장의 끝에 세미콜론을 추가할지 여부
+    "singleQuote": true, // 문자열에 작은 따옴표를 사용할지 여부
+    "trailingComma": "all", // 가능한 모든 곳에 쉼표를 추가
+    "bracketSpacing": true, // 객체 리터럴에서 괄호 사이의 공백 여부
+    "jsxBracketSameLine": false, // JSX의 닫는 괄호를 같은 줄에 둘지 여부
+    "arrowParens": "always", // 화살표 함수의 매개변수에 괄호를 항상 사용할지 여부
+    "endOfLine": "lf", // 줄바꿈 문자 설정 (LF)
+    "parser": "babel" // Babel 파서를 사용하여 ES6+ 구문 지원
+  }
+  
