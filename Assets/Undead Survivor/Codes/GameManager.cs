@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public bool isLive;
     public float gameTime;
     public int targetFrameRate;
+    public string version = "1.0.0";
 
     [Header("# Player Info")]
     public int playerId;
@@ -28,7 +29,7 @@ public class GameManager : MonoBehaviour
     }
 
     public void GameStart() {
-        playerId = Random.Range(0, 5);
+        playerId = Random.Range(0, 4);
         player.gameObject.SetActive(true);
         hud.SetActive(true);
         GameStartUI.SetActive(false);

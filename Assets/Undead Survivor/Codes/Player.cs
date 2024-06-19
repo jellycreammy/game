@@ -35,11 +35,11 @@ public class Player : MonoBehaviour
     //     inputVec.x = Input.GetAxisRaw("Horizontal");
     //     inputVec.y = Input.GetAxisRaw("Vertical");
     // }
-
-    void Update() {
-        Debug.Log(transform.position.ToString());
+    void Update()
+    {
+        Debug.Log("프레임 시간: " + Time.deltaTime);
     }
-
+    
     // input system 방식
     void OnMove(InputValue value) {
         inputVec = value.Get<Vector2>();
