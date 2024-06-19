@@ -8,8 +8,6 @@ public class Player : MonoBehaviour
 {
     public Vector2 inputVec;
     public float speed;
-    public Scanner scanner;
-    public Hand[] hands;
     public RuntimeAnimatorController[] animCon;
 
     Rigidbody2D rigid;
@@ -21,12 +19,9 @@ public class Player : MonoBehaviour
         rigid = GetComponent<Rigidbody2D>();
         spriter = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
-        scanner = GetComponent<Scanner>();
-        hands = GetComponentsInChildren<Hand>(true);
     }
 
     void OnEnable() {
-        speed *= Character.Speed;
         anim.runtimeAnimatorController = animCon[GameManager.instance.playerId];
     }
 
@@ -61,7 +56,7 @@ public class Player : MonoBehaviour
         // rigid.velocity = inputVec;
 
         // 위치 이동
-        Vector2 nextVec = inputVec.normalized * speed * Time.fixedDeltaTime;
+        Vector2 nextVec = inputVec * speed * Time.fixedDeltaTime;
         rigid.MovePosition(rigid.position + nextVec);
     }
 
@@ -80,17 +75,6 @@ public class Player : MonoBehaviour
     void OnCollisionStay2D(Collision2D collision) {
         if (!GameManager.instance.isLive) {
             return;
-        }
-
-        GameManager.instance.health -= Time.deltaTime * 10;
-
-        if (GameManager.instance.health < 0) {
-            for (int i = 2; i < transform.childCount; i++) {
-                transform.GetChild(i).gameObject.SetActive(false);
-            }
-
-            anim.SetTrigger("Dead");
-            GameManager.instance.GameOver();
         }
     }
 }

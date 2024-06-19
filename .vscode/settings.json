@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "node5_tcp_sample.sln"
+    "dotnet.defaultSolution": "node5_unity_sample.sln"
 }
