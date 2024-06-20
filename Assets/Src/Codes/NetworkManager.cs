@@ -17,6 +17,9 @@ public class NetworkManager : MonoBehaviour
 
     WaitForSecondsRealtime wait;
 
+    private byte[] receiveBuffer = new byte[4096];
+    private List<byte> incompleteData = new List<byte>();
+
     void Awake() {
         wait = new WaitForSecondsRealtime(5);
     }
@@ -32,6 +35,7 @@ public class NetworkManager : MonoBehaviour
             if (ConnectToServer(ip, portNumber)) {
                 StartGame();
                 SendInitialPacket();
+                StartReceiving(); // Start receiving data
             } else {
                 AudioManager.instance.PlaySfx(AudioManager.Sfx.LevelUp);
                 StartCoroutine(NoticeRoutine(1));
@@ -72,7 +76,6 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-
     string GenerateUniqueID() {
         return System.Guid.NewGuid().ToString();
     }
@@ -83,7 +86,6 @@ public class NetworkManager : MonoBehaviour
         Debug.Log("Game Started");
         GameManager.instance.GameStart();
     }
-
 
     IEnumerator NoticeRoutine(int index) {
         
@@ -158,4 +160,77 @@ public class NetworkManager : MonoBehaviour
         Debug.Log("Initial packet sent.");
     }
 
+    void StartReceiving() {
+        _ = ReceivePacketsAsync();
+    }
+
+    async System.Threading.Tasks.Task ReceivePacketsAsync() {
+        while (tcpClient.Connected) {
+            try {
+                int bytesRead = await stream.ReadAsync(receiveBuffer, 0, receiveBuffer.Length);
+                if (bytesRead > 0) {
+                    ProcessReceivedData(receiveBuffer, bytesRead);
+                }
+            } catch (Exception e) {
+                Debug.LogError($"Receive error: {e.Message}");
+                break;
+            }
+        }
+    }
+
+    void ProcessReceivedData(byte[] data, int length) {
+         incompleteData.AddRange(data.AsSpan(0, length).ToArray());
+
+        while (incompleteData.Count >= 5)
+        {
+            // 패킷 길이와 타입 읽기
+            byte[] lengthBytes = incompleteData.GetRange(0, 4).ToArray();
+            int packetLength = BitConverter.ToInt32(ToBigEndian(lengthBytes), 0);
+            Packets.PacketType packetType = (Packets.PacketType)incompleteData[4];
+
+            if (incompleteData.Count < packetLength)
+            {
+                // 데이터가 충분하지 않으면 반환
+                return;
+            }
+
+            // 패킷 데이터 추출
+            byte[] packetData = incompleteData.GetRange(5, packetLength - 5).ToArray();
+            incompleteData.RemoveRange(0, packetLength);
+
+            Debug.Log($"Received packet: Length = {packetLength}, Type = {packetType}");
+
+            switch (packetType)
+            {
+                case Packets.PacketType.Normal:
+                    HandleNormalPacket(packetData);
+                    break;
+                // 필요한 다른 패킷 타입을 처리
+            }
+        }
+    }
+
+    void HandleNormalPacket(byte[] packetData) {
+        // 패킷 데이터 처리
+        Debug.Log("Handling normal packet");
+        Debug.Log($"Packet Data: {BitConverter.ToString(packetData)}");
+
+        var response = Packets.Deserialize<Response>(packetData);
+        Debug.Log($"HandlerId: {response.handlerId}, responseCode: {response.responseCode}, timestamp: {response.timestamp}");
+        
+        if (response.data != null && response.data.Length > 0) {
+            ProcessResponseData(response.data);
+        }
+    }
+
+    void ProcessResponseData(byte[] data) {
+    try {
+       
+        // var specificData = Packets.Deserialize<SpecificDataType>(data);
+        string jsonString = Encoding.UTF8.GetString(data);
+        Debug.Log($"Processed SpecificDataType: {jsonString}");
+    } catch (Exception e) {
+        Debug.LogError($"Error processing response data: {e.Message}");
+    }
+}
 }
