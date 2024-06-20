@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -120,20 +121,30 @@ public class NetworkManager : MonoBehaviour
 
     void SendInitialPacket() {
         // 패킷 데이터
-        // // InitialPacketPayload 생성
-        // InitialPacket initialPayload = new InitialPacket {
-        //     DeviceId = GameManager.instance.deviceId
-        // };
+        // InitialPacketPayload 생성
+        InitialPayload initialPayload = new InitialPayload
+        {
+            deviceId = GameManager.instance.deviceId
+        };
 
-        // byte[] data = Packets.Serialize(
-        //     Packets.CreateCommonPacket(
-        //             0, 
-        //             GameManager.instance.playerId, 
-        //             GameManager.instance.version,
-        //             initialPayload
-        //         )
-        //     );
-        byte[] data = new byte[0];
+        // ArrayBufferWriter<byte>를 사용하여 직렬화
+        var initialPayloadWriter = new ArrayBufferWriter<byte>();
+        Packets.Serialize(initialPayloadWriter, initialPayload);
+        byte[] payload = initialPayloadWriter.WrittenSpan.ToArray();
+
+        CommonPacket commonPacket = new CommonPacket
+        {
+            handlerId = 0,
+            playerId = GameManager.instance.playerId,
+            version = GameManager.instance.version,
+            payload = payload,
+        };
+
+        // ArrayBufferWriter<byte>를 사용하여 직렬화
+        var commonPacketWriter = new ArrayBufferWriter<byte>();
+        Packets.Serialize(commonPacketWriter, commonPacket);
+        byte[] data = commonPacketWriter.WrittenSpan.ToArray();
+
         // 헤더 생성
         byte[] header = CreatePacketHeader(data.Length, Packets.PacketType.Normal);
 

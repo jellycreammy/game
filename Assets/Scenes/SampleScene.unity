@@ -6104,7 +6104,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 7.796296
+  orthographic size: 7.648148
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -12247,7 +12247,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isLive: 0
   gameTime: 0
-  targetFrameRate: 0
+  targetFrameRate: 60
   version: 1.0.0
   playerId: 0
   deviceId: 

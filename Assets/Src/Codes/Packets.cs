@@ -1,34 +1,43 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using ProtoBuf;
+using System.IO;
+using System.Buffers;
 
 public class Packets : MonoBehaviour
 {
     public enum PacketType { Ping, Normal, Location = 3 }
 
-// // Protobuf 직렬화 함수
-//     public static byte[] Serialize<T>(T message) where T : IMessage
-//     {
-//         return message.ToByteArray();
-//     }
-    
-//     // Protobuf 역직렬화 함수
-//     public static T Deserialize<T>(byte[] data) where T : IMessage<T>, new()
-//     {
-//         T message = new T();
-//         message.MergeFrom(data);
-//         return message;
-//     }
+    public static void Serialize<T>(IBufferWriter<byte> writer, T data)
+    {
+        Serializer.Serialize(writer, data);
+    }
 
-//     public static CommonPacket CreateCommonPacket(uint handlerId, uint playerId, string version, IMessage payload) {
-//         return new CommonPacket
-//         {
-//             HandlerId = handlerId,
-//             PlayerId = playerId,
-//             Version = version,
-//             Payload = ByteString.CopyFrom(Serialize(payload))
-//         };
-//     }
+  // ReadOnlySequence<byte>를 사용하는 역직렬화 함수
+    public static T Deserialize<T>(ReadOnlySequence<byte> data)
+    {
+        return Serializer.Deserialize<T>(data);
+    }
+}
+
+[ProtoContract]
+public class InitialPayload
+{
+    [ProtoMember(1)]
+    public string deviceId { get; set; }
+}
+
+[ProtoContract]
+public class CommonPacket
+{
+    [ProtoMember(1)]
+    public uint handlerId { get; set; }
+
+    [ProtoMember(2)]
+    public uint playerId { get; set; }
+
+    [ProtoMember(3)]
+    public string version { get; set; }
+
+    [ProtoMember(4)]
+    public byte[] payload { get; set; }
 }
