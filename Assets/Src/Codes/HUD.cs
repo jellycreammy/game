@@ -10,7 +10,6 @@ public class HUD : MonoBehaviour
     public InfoType type;
 
     Text myText;
-    Slider mySlider;
 
     void Awake() {
         myText = GetComponent<Text>();

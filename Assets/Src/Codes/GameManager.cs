@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,7 +13,7 @@ public class GameManager : MonoBehaviour
     public string version = "1.0.0";
 
     [Header("# Player Info")]
-    public int playerId;
+    public uint playerId;
     public string deviceId;
 
     [Header("# Game Object")]
@@ -29,7 +28,7 @@ public class GameManager : MonoBehaviour
     }
 
     public void GameStart() {
-        playerId = Random.Range(0, 4);
+        playerId = (uint)Random.Range(0, 4);
         player.gameObject.SetActive(true);
         hud.SetActive(true);
         GameStartUI.SetActive(false);

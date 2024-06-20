@@ -32,15 +32,13 @@ public class NetworkManager : MonoBehaviour
                 StartGame();
                 SendInitialPacket();
             } else {
-                uiNotice.transform.GetChild(1).gameObject.SetActive(true);
-                StartCoroutine(NoticeRoutine());
                 AudioManager.instance.PlaySfx(AudioManager.Sfx.LevelUp);
+                StartCoroutine(NoticeRoutine(1));
             }
             
         } else {
-            uiNotice.transform.GetChild(0).gameObject.SetActive(true);
-            StartCoroutine(NoticeRoutine());
             AudioManager.instance.PlaySfx(AudioManager.Sfx.LevelUp);
+            StartCoroutine(NoticeRoutine(0));
         }
     }
 
@@ -86,13 +84,15 @@ public class NetworkManager : MonoBehaviour
     }
 
 
-    IEnumerator NoticeRoutine() {
+    IEnumerator NoticeRoutine(int index) {
         
         uiNotice.SetActive(true);
+        uiNotice.transform.GetChild(index).gameObject.SetActive(true);
 
         yield return wait;
 
         uiNotice.SetActive(false);
+        uiNotice.transform.GetChild(index).gameObject.SetActive(false);
     }
 
     public static byte[] ToBigEndian(byte[] bytes) {
@@ -120,21 +120,20 @@ public class NetworkManager : MonoBehaviour
 
     void SendInitialPacket() {
         // 패킷 데이터
-        // InitialPacketPayload 생성
-        InitialPacketPayload initialPayload = new InitialPacketPayload
-        {
-            deviceId = GameManager.instance.deviceId
-        };
+        // // InitialPacketPayload 생성
+        // InitialPacket initialPayload = new InitialPacket {
+        //     DeviceId = GameManager.instance.deviceId
+        // };
 
-        byte[] data = Packets.SerializePacket(
-            Packets.CreateCommonPacket(
-                    1, 
-                    null, 
-                    GameManager.instance.version,
-                    Packets.SerializePacket(initialPayload)
-                )
-            );
-
+        // byte[] data = Packets.Serialize(
+        //     Packets.CreateCommonPacket(
+        //             0, 
+        //             GameManager.instance.playerId, 
+        //             GameManager.instance.version,
+        //             initialPayload
+        //         )
+        //     );
+        byte[] data = new byte[0];
         // 헤더 생성
         byte[] header = CreatePacketHeader(data.Length, Packets.PacketType.Normal);
 
