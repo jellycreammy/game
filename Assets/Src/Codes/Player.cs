@@ -25,25 +25,19 @@ public class Player : MonoBehaviour
         anim.runtimeAnimatorController = animCon[GameManager.instance.playerId];
     }
 
-    // // Update is called once per frame
-    // 기존 방식
-    // void Update()
-    // {
-    //     if (!GameManager.instance.isLive) {
-    //         return;
-    //     }
-    //     inputVec.x = Input.GetAxisRaw("Horizontal");
-    //     inputVec.y = Input.GetAxisRaw("Vertical");
-    // }
-    // void Update()
-    // {
-    //     Debug.Log("프레임 시간: " + Time.deltaTime);
-    // }
-    
-    // input system 방식
-    void OnMove(InputValue value) {
-        inputVec = value.Get<Vector2>();
+    // Update is called once per frame
+    void Update()
+    {
+        if (!GameManager.instance.isLive) {
+            return;
+        }
+        inputVec.x = Input.GetAxisRaw("Horizontal");
+        inputVec.y = Input.GetAxisRaw("Vertical");
+
+        // 위치 이동 패킷 전송 -> 서버로
+        NetworkManager.instance.SendLocationUpdatePacket(rigid.position.x, rigid.position.y);
     }
+
 
     void FixedUpdate() {
         if (!GameManager.instance.isLive) {
@@ -65,6 +59,7 @@ public class Player : MonoBehaviour
         if (!GameManager.instance.isLive) {
             return;
         }
+
         anim.SetFloat("Speed", inputVec.magnitude);
 
         if (inputVec.x != 0) {

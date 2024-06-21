@@ -9,8 +9,11 @@ using UnityEngine.UI;
 
 public class NetworkManager : MonoBehaviour
 {
+    public static NetworkManager instance;
+
     public InputField ipInputField;
     public InputField portInputField;
+    public InputField deviceIdInputField;
     public GameObject uiNotice;
     private TcpClient tcpClient;
     private NetworkStream stream;
@@ -20,22 +23,27 @@ public class NetworkManager : MonoBehaviour
     private byte[] receiveBuffer = new byte[4096];
     private List<byte> incompleteData = new List<byte>();
 
-    void Awake() {
+    void Awake() {        
+        instance = this;
         wait = new WaitForSecondsRealtime(5);
     }
-
     public void OnStartButtonClicked() {
         string ip = ipInputField.text;
         string port = portInputField.text;
 
         if (IsValidIP(ip) && IsValidPort(port)) {
             int portNumber = int.Parse(port);
-            GameManager.instance.deviceId = GenerateUniqueID();
-            
+
+            if (deviceIdInputField.text != "") {
+                GameManager.instance.deviceId = deviceIdInputField.text;
+            } else {
+                if (GameManager.instance.deviceId == "") {
+                    GameManager.instance.deviceId = GenerateUniqueID();
+                }
+            }
+  
             if (ConnectToServer(ip, portNumber)) {
                 StartGame();
-                SendInitialPacket();
-                StartReceiving(); // Start receiving data
             } else {
                 AudioManager.instance.PlaySfx(AudioManager.Sfx.LevelUp);
                 StartCoroutine(NoticeRoutine(1));
@@ -84,7 +92,10 @@ public class NetworkManager : MonoBehaviour
     {
         // 게임 시작 코드 작성
         Debug.Log("Game Started");
+        StartReceiving(); // Start receiving data
         GameManager.instance.GameStart();
+        Debug.Log(GameManager.instance.playerId);
+        SendInitialPacket();
     }
 
     IEnumerator NoticeRoutine(int index) {
@@ -121,25 +132,20 @@ public class NetworkManager : MonoBehaviour
         return header;
     }
 
-    void SendInitialPacket() {
-        // 패킷 데이터
-        // InitialPacketPayload 생성
-        InitialPayload initialPayload = new InitialPayload
-        {
-            deviceId = GameManager.instance.deviceId
-        };
-
+    // 공통 패킷 생성 함수
+    void SendPacket<T>(T payload, uint handlerId)
+    {
         // ArrayBufferWriter<byte>를 사용하여 직렬화
-        var initialPayloadWriter = new ArrayBufferWriter<byte>();
-        Packets.Serialize(initialPayloadWriter, initialPayload);
-        byte[] payload = initialPayloadWriter.WrittenSpan.ToArray();
+        var payloadWriter = new ArrayBufferWriter<byte>();
+        Packets.Serialize(payloadWriter, payload);
+        byte[] payloadData = payloadWriter.WrittenSpan.ToArray();
 
         CommonPacket commonPacket = new CommonPacket
         {
-            handlerId = 0,
-            playerId = GameManager.instance.playerId,
+            handlerId = handlerId,
+            userId = GameManager.instance.deviceId,
             version = GameManager.instance.version,
-            payload = payload,
+            payload = payloadData,
         };
 
         // ArrayBufferWriter<byte>를 사용하여 직렬화
@@ -157,8 +163,30 @@ public class NetworkManager : MonoBehaviour
 
         // 패킷 전송
         stream.Write(packet, 0, packet.Length);
-        Debug.Log("Initial packet sent.");
     }
+
+    void SendInitialPacket() {
+        InitialPayload initialPayload = new InitialPayload
+        {
+            deviceId = GameManager.instance.deviceId,
+            playerId = GameManager.instance.playerId,
+            latency = GameManager.instance.latency,
+        };
+
+        // handlerId는 0으로 가정
+        SendPacket(initialPayload, (uint)Packets.HandlerIds.Init);
+    }
+
+    public void SendLocationUpdatePacket(float x, float y) {
+        LocationUpdatePayload locationUpdatePayload = new LocationUpdatePayload
+        {
+            x = x,
+            y = y,
+        };
+
+        SendPacket(locationUpdatePayload, (uint)Packets.HandlerIds.LocationUpdate);
+    }
+
 
     void StartReceiving() {
         _ = ReceivePacketsAsync();
@@ -205,32 +233,55 @@ public class NetworkManager : MonoBehaviour
                 case Packets.PacketType.Normal:
                     HandleNormalPacket(packetData);
                     break;
-                // 필요한 다른 패킷 타입을 처리
+                case Packets.PacketType.Location:
+                    HandleLocationPacket(packetData);
+                    break;
             }
         }
     }
 
     void HandleNormalPacket(byte[] packetData) {
         // 패킷 데이터 처리
-        Debug.Log("Handling normal packet");
-        Debug.Log($"Packet Data: {BitConverter.ToString(packetData)}");
-
         var response = Packets.Deserialize<Response>(packetData);
         Debug.Log($"HandlerId: {response.handlerId}, responseCode: {response.responseCode}, timestamp: {response.timestamp}");
         
+        if (response.responseCode != 0 && !uiNotice.activeSelf) {
+            AudioManager.instance.PlaySfx(AudioManager.Sfx.LevelUp);
+            StartCoroutine(NoticeRoutine(2));
+            return;
+        }
+
         if (response.data != null && response.data.Length > 0) {
             ProcessResponseData(response.data);
         }
     }
 
     void ProcessResponseData(byte[] data) {
-    try {
-       
-        // var specificData = Packets.Deserialize<SpecificDataType>(data);
-        string jsonString = Encoding.UTF8.GetString(data);
-        Debug.Log($"Processed SpecificDataType: {jsonString}");
-    } catch (Exception e) {
-        Debug.LogError($"Error processing response data: {e.Message}");
+        try {
+        
+            // var specificData = Packets.Deserialize<SpecificDataType>(data);
+            string jsonString = Encoding.UTF8.GetString(data);
+            Debug.Log($"Processed SpecificDataType: {jsonString}");
+        } catch (Exception e) {
+            Debug.LogError($"Error processing response data: {e.Message}");
+        }
     }
-}
+
+    void HandleLocationPacket(byte[] data) {
+        try {
+            LocationUpdate response;
+
+            if (data.Length > 0) {
+                // 패킷 데이터 처리
+                response = Packets.Deserialize<LocationUpdate>(data);
+            } else {
+                // data가 비어있을 경우 빈 배열을 전달
+                response = new LocationUpdate { users = new List<LocationUpdate.UserLocation>() };
+            }
+
+            Spawner.instance.Spawn(response);
+        } catch (Exception e) {
+            Debug.LogError($"Error HandleLocationPacket: {e.Message}");
+        }
+    }
 }

@@ -1,35 +1,36 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class Spawner : MonoBehaviour
 {
-    public Transform[] spawnPoint;
-    public SpawnData[] spawnData;
-
+    public static Spawner instance;
+    private HashSet<string> currentUsers = new HashSet<string>();
+    
     void Awake() {
-        spawnPoint = GetComponentsInChildren<Transform>();
+        instance = this;
     }
 
-    // void Update()
-    // {
-    //     if (!GameManager.instance.isLive) {
-    //         return;
-    //     }
-    //     Spawn();
-    // }
+    public void Spawn(LocationUpdate data) {
+        if (!GameManager.instance.isLive) {
+            return;
+        }
+        
+        HashSet<string> newUsers = new HashSet<string>();
 
-    // void Spawn() {
-    //     GameObject enemy = GameManager.instance.pool.Get(0);
-    //     // enemy.transform.position = spawnPoint[Random.Range(1, spawnPoint.Length)].position;
-    //     // enemy.GetComponent<Enemy>().Init(spawnData[level]);
-    // }
-}
+        foreach(LocationUpdate.UserLocation user in data.users) {
+            newUsers.Add(user.id);
 
-[System.Serializable]
-public class SpawnData {
-    public float spawnTime;
-    public int spriteType;
-    public int health;
-    public float speed;
+            GameObject player = GameManager.instance.pool.Get(user);
+            PlayerPrefab playerScript = player.GetComponent<PlayerPrefab>();
+            playerScript.UpdatePosition(user.x, user.y);
+        }
+
+        foreach (string userId in currentUsers) {
+            if (!newUsers.Contains(userId)) {
+                GameManager.instance.pool.Remove(userId);
+            }
+        }
+        
+        currentUsers = newUsers;
+    }
 }

@@ -8,6 +8,10 @@ using System;
 public class Packets : MonoBehaviour
 {
     public enum PacketType { Ping, Normal, Location = 3 }
+    public enum HandlerIds {
+        Init = 0,
+        LocationUpdate = 2 
+    }
 
     public static void Serialize<T>(IBufferWriter<byte> writer, T data)
     {
@@ -15,11 +19,6 @@ public class Packets : MonoBehaviour
     }
 
     public static T Deserialize<T>(byte[] data) {
-        if (data == null || data.Length == 0) {
-            Debug.LogError("Deserialize: data is null or empty");
-            throw new ArgumentException("Data is null or empty", nameof(data));
-        }
-
         try {
             using (var stream = new MemoryStream(data)) {
                 return ProtoBuf.Serializer.Deserialize<T>(stream);
@@ -34,8 +33,14 @@ public class Packets : MonoBehaviour
 [ProtoContract]
 public class InitialPayload
 {
-    [ProtoMember(1)]
+    [ProtoMember(1, IsRequired = true)]
     public string deviceId { get; set; }
+
+    [ProtoMember(2, IsRequired = true)]
+    public uint playerId { get; set; }
+    
+    [ProtoMember(3, IsRequired = true)]
+    public float latency { get; set; }
 }
 
 [ProtoContract]
@@ -45,7 +50,7 @@ public class CommonPacket
     public uint handlerId { get; set; }
 
     [ProtoMember(2)]
-    public uint playerId { get; set; }
+    public string userId { get; set; }
 
     [ProtoMember(3)]
     public string version { get; set; }
@@ -56,9 +61,9 @@ public class CommonPacket
 
 [ProtoContract]
 public class LocationUpdatePayload {
-    [ProtoMember(1)]
+    [ProtoMember(1, IsRequired = true)]
     public float x { get; set; }
-    [ProtoMember(2)]
+    [ProtoMember(2, IsRequired = true)]
     public float y { get; set; }
 }
 
@@ -66,7 +71,7 @@ public class LocationUpdatePayload {
 public class LocationUpdate
 {
     [ProtoMember(1)]
-    public List<UserLocation> Users { get; set; }
+    public List<UserLocation> users { get; set; }
 
     [ProtoContract]
     public class UserLocation
@@ -75,13 +80,13 @@ public class LocationUpdate
         public string id { get; set; }
 
         [ProtoMember(2)]
-        public string playerId { get; set; }
+        public uint playerId { get; set; }
 
         [ProtoMember(3)]
-        public float X { get; set; }
+        public float x { get; set; }
 
         [ProtoMember(4)]
-        public float Y { get; set; }
+        public float y { get; set; }
     }
 }
 

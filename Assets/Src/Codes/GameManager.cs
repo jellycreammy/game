@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public float gameTime;
     public int targetFrameRate;
     public string version = "1.0.0";
+    public float latency = 2;
 
     [Header("# Player Info")]
     public uint playerId;
