@@ -30,7 +30,7 @@ public class PoolManager : MonoBehaviour
             if (!item.activeSelf) {
                 // 발견하면 select에 할당
                 select = item;
-                select.GetComponent<PlayerPrefab>().Init(data.playerId);
+                select.GetComponent<PlayerPrefab>().Init(data.playerId, data.id);
                 select.SetActive(true);
                 userDictionary[data.id] = select;
                 break;
@@ -41,7 +41,7 @@ public class PoolManager : MonoBehaviour
             // 새롭게 생성하고 select 변수에 할당
             select = Instantiate(prefabs[0], transform);
             pool.Add(select);
-            select.GetComponent<PlayerPrefab>().Init(data.playerId);
+            select.GetComponent<PlayerPrefab>().Init(data.playerId, data.id);
             userDictionary[data.id] = select;
         }
 

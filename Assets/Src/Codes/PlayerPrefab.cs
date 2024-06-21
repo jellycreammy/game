@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerPrefab : MonoBehaviour
 {
@@ -10,23 +12,32 @@ public class PlayerPrefab : MonoBehaviour
     private Vector3 lastPosition;
     private Vector3 currentPosition;
     private uint playerId;
-
+    TextMeshPro myText;
+    
     void Awake()
     {
         anim = GetComponent<Animator>();
         spriter = GetComponent<SpriteRenderer>();
+        myText = GetComponentInChildren<TextMeshPro>();
     }
 
-    public void Init(uint playerId)
+    public void Init(uint playerId, string id)
     {
         anim.runtimeAnimatorController = animCon[playerId];
         lastPosition = Vector3.zero;
         currentPosition = Vector3.zero;
         this.playerId = playerId;
+
+        if (id.Length > 5) {
+            myText.text = id[..5];
+        } else {
+            myText.text = id;
+        }
+        myText.GetComponent<MeshRenderer>().sortingOrder = 6;
     }
 
     void OnEnable()
-    {
+    {    
         anim.runtimeAnimatorController = animCon[playerId];
     }
 

@@ -30,6 +30,7 @@ public class GameManager : MonoBehaviour
 
     public void GameStart() {
         playerId = (uint)Random.Range(0, 4);
+        player.deviceId = deviceId;
         player.gameObject.SetActive(true);
         hud.SetActive(true);
         GameStartUI.SetActive(false);

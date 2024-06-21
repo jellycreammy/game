@@ -1,27 +1,40 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
     public Vector2 inputVec;
     public float speed;
+    public string deviceId;
     public RuntimeAnimatorController[] animCon;
 
     Rigidbody2D rigid;
     SpriteRenderer spriter;
     Animator anim;
+    TextMeshPro myText;
 
     void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
         spriter = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
+        myText = GetComponentInChildren<TextMeshPro>();
     }
 
     void OnEnable() {
+
+        if (deviceId.Length > 5) {
+            myText.text = deviceId[..5];
+        } else {
+            myText.text = deviceId;
+        }
+        myText.GetComponent<MeshRenderer>().sortingOrder = 6;
+        
         anim.runtimeAnimatorController = animCon[GameManager.instance.playerId];
     }
 
