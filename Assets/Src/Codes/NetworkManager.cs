@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -132,7 +133,7 @@ public class NetworkManager : MonoBehaviour
     }
 
     // 공통 패킷 생성 함수
-    void SendPacket<T>(T payload, uint handlerId)
+    async void SendPacket<T>(T payload, uint handlerId)
     {
         // ArrayBufferWriter<byte>를 사용하여 직렬화
         var payloadWriter = new ArrayBufferWriter<byte>();
@@ -160,6 +161,8 @@ public class NetworkManager : MonoBehaviour
         Array.Copy(header, 0, packet, 0, header.Length);
         Array.Copy(data, 0, packet, header.Length, data.Length);
 
+        await Task.Delay(GameManager.instance.latency);
+        
         // 패킷 전송
         stream.Write(packet, 0, packet.Length);
     }
