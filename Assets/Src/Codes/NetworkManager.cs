@@ -252,7 +252,7 @@ public class NetworkManager : MonoBehaviour
             return;
         }
 
-        if (response.data != null && response.data.Length > 0) {1111
+        if (response.data != null && response.data.Length > 0) {
             if (response.handlerId == 0) {
                 GameManager.instance.GameStart();
             }
