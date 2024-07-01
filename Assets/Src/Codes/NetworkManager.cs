@@ -18,7 +18,7 @@ public class NetworkManager : MonoBehaviour
     public GameObject uiNotice;
     private TcpClient tcpClient;
     private NetworkStream stream;
-
+    
     WaitForSecondsRealtime wait;
 
     private byte[] receiveBuffer = new byte[4096];
@@ -94,7 +94,6 @@ public class NetworkManager : MonoBehaviour
         // 게임 시작 코드 작성
         Debug.Log("Game Started");
         StartReceiving(); // Start receiving data
-        GameManager.instance.GameStart();
         SendInitialPacket();
     }
 
@@ -253,14 +252,16 @@ public class NetworkManager : MonoBehaviour
             return;
         }
 
-        if (response.data != null && response.data.Length > 0) {
+        if (response.data != null && response.data.Length > 0) {1111
+            if (response.handlerId == 0) {
+                GameManager.instance.GameStart();
+            }
             ProcessResponseData(response.data);
         }
     }
 
     void ProcessResponseData(byte[] data) {
         try {
-        
             // var specificData = Packets.Deserialize<SpecificDataType>(data);
             string jsonString = Encoding.UTF8.GetString(data);
             Debug.Log($"Processed SpecificDataType: {jsonString}");
