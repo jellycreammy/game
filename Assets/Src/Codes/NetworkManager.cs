@@ -28,6 +28,50 @@ public class NetworkManager : MonoBehaviour
         instance = this;
         wait = new WaitForSecondsRealtime(5);
     }
+    void Start()
+    {
+        // 수동 연결
+        ipInputField = GameObject.Find("IP Input Field")?.GetComponent<InputField>();
+        portInputField = GameObject.Find("Port Input Field")?.GetComponent<InputField>();
+        deviceIdInputField = GameObject.Find("Device ID Input Field")?.GetComponent<InputField>();
+        uiNotice = GameObject.Find("UI Notice");
+
+        if (ipInputField == null)
+        {
+            Debug.LogError("IP Input Field is not found or not assigned.");
+        }
+        else
+        {
+            Debug.Log($"IP Input Field: {ipInputField}");
+        }
+
+        if (portInputField == null)
+        {
+            Debug.LogError("Port Input Field is not found or not assigned.");
+        }
+        else
+        {
+            Debug.Log($"Port Input Field: {portInputField}");
+        }
+
+        if (deviceIdInputField == null)
+        {
+            Debug.LogError("Device ID Input Field is not found or not assigned.");
+        }
+        else
+        {
+            Debug.Log($"Device ID Input Field: {deviceIdInputField}");
+        }
+
+        if (uiNotice == null)
+        {
+            Debug.LogError("UI Notice is not found or not assigned.");
+        }
+        else
+        {
+            Debug.Log($"UI Notice: {uiNotice}");
+        }
+    }
     public void OnStartButtonClicked() {
         string ip = ipInputField.text;
         string port = portInputField.text;

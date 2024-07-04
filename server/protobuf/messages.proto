@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+message CommonPacket {
+    uint32 handlerId = 1;
+    string userId = 2;
+    string version = 3;
+    bytes payload = 4;
+}
+
+message InitialPayload {
+    string deviceId = 1;
+    uint32 playerId = 2;
+    float latency = 3;
+}
+
+message LocationUpdatePayload {
+    float x = 1;
+    float y = 2;
+}
+
+message LocationUpdate {
+    repeated UserLocation users = 1;
+
+    message UserLocation {
+        string id = 1;
+        uint32 playerId = 2;
+        float x = 3;
+        float y = 4;
+    }
+}
+
+message Response {
+    uint32 handlerId = 1;
+    uint32 responseCode = 2;
+    int64 timestamp = 3;
+    bytes data = 4;
+}

@@ -1,0 +1,13 @@
+{
+    "name": "unity-multiplayer-server",
+    "version": "1.0.0",
+    "main": "init/server.js",
+    "scripts": {
+      "start": "node init/server.js"
+    },
+    "dependencies": {
+      "net": "^1.0.2",
+      "protobufjs": "^6.11.2"
+    }
+  }
+  

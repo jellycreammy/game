@@ -1,0 +1,17 @@
+{
+  "name": "node5_unity_sample",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server/init/server.js",
+  "scripts": {
+    "start": "node server/init/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "net": "^1.0.2",
+    "protobufjs": "^7.3.2"
+  }
+}
