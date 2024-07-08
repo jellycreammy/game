@@ -28,49 +28,51 @@ public class NetworkManager : MonoBehaviour
         instance = this;
         wait = new WaitForSecondsRealtime(5);
     }
-    void Start()
+   void Start()
+{
+    // 수동 연결
+    ipInputField = GameObject.Find("IP 입력 필드")?.GetComponent<InputField>();
+    portInputField = GameObject.Find("포트 입력 필드")?.GetComponent<InputField>();
+    deviceIdInputField = GameObject.Find("디바이스 ID 입력 필드")?.GetComponent<InputField>();
+    uiNotice = GameObject.Find("UI 알림");
+
+    if (ipInputField == null)
     {
-        // 수동 연결
-        ipInputField = GameObject.Find("IP Input Field")?.GetComponent<InputField>();
-        portInputField = GameObject.Find("Port Input Field")?.GetComponent<InputField>();
-        deviceIdInputField = GameObject.Find("Device ID Input Field")?.GetComponent<InputField>();
-        uiNotice = GameObject.Find("UI Notice");
+        Debug.LogError("IP 입력 필드를 찾을 수 없습니다.");
+    }
+    else
+    {
+        Debug.Log($"IP 입력 필드: {ipInputField}");
+    }
 
-        if (ipInputField == null)
-        {
-            Debug.LogError("IP Input Field is not found or not assigned.");
-        }
-        else
-        {
-            Debug.Log($"IP Input Field: {ipInputField}");
-        }
+    if (portInputField == null)
+    {
+        Debug.LogError("포트 입력 필드를 찾을 수 없습니다.");
+    }
+    else
+    {
+        Debug.Log($"포트 입력 필드: {portInputField}");
+    }
 
-        if (portInputField == null)
-        {
-            Debug.LogError("Port Input Field is not found or not assigned.");
-        }
-        else
-        {
-            Debug.Log($"Port Input Field: {portInputField}");
-        }
+    if (deviceIdInputField == null)
+    {
+        Debug.LogError("디바이스 ID 입력 필드를 찾을 수 없습니다.");
+    }
+    else
+    {
+        Debug.Log($"디바이스 ID 입력 필드: {deviceIdInputField}");
+    }
 
-        if (deviceIdInputField == null)
-        {
-            Debug.LogError("Device ID Input Field is not found or not assigned.");
-        }
-        else
-        {
-            Debug.Log($"Device ID Input Field: {deviceIdInputField}");
-        }
+    if (uiNotice == null)
+    {
+        Debug.LogError("UI 알림을 찾을 수 없습니다.");
+    }
+    else
+    {
+        Debug.Log($"UI 알림: {uiNotice}");
+    }
+}
 
-        if (uiNotice == null)
-        {
-            Debug.LogError("UI Notice is not found or not assigned.");
-        }
-        else
-        {
-            Debug.Log($"UI Notice: {uiNotice}");
-        }
     }
     public void OnStartButtonClicked() {
         string ip = ipInputField.text;

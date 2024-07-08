@@ -1,5 +1,5 @@
 const net = require('net');
-const { Game, User } = require('../classes/game');
+const { Game, User } = require('../classes/gameInstance');
 const { handleMessage } = require('../handlers/messageHandler');
 
 const HOST = process.env.SERVER_HOST || '0.0.0.0';

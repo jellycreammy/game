@@ -5,7 +5,7 @@ const InitialPayload = protobuf.lookupType("InitialPayload");
 const LocationUpdatePayload = protobuf.lookupType("LocationUpdatePayload");
 
 function decodeMessage(data) {
-    // 적절한 디코딩 로직을 구현합니다.
+    // 적절한 디코딩 로직을 구현
     return InitialPayload.decode(data); // 예시로 InitialPayload 디코딩
 }
 
